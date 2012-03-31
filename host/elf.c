@@ -55,19 +55,25 @@ static void array_free_all(struct uint32_array * alloc) {
 
 uint32_t* elf_get_offsets(int fd, uint32_t* count) {
     struct uint32_array* array_data = array_alloc();
-    if (!array_data) return NULL;
+    if (!array_data) {
+        printf("ELF: Unable to allocate memory\n");
+        return NULL;
+    }
 
     if ( elf_version ( EV_CURRENT ) == EV_NONE ) {
+        printf("ELF: elf_version ( EV_CURRENT ) is not EV_NONE\n");
         goto cleanupfail;
     }
 
     Elf *ar_e = elf_begin(fd, ELF_C_READ, NULL);
     if (!ar_e) {
+        printf("ELF: call to elf_begin() failed\n");
         goto cleanupfail;
     }
 
     size_t strindex;
     if (elf_getshdrstrndx(ar_e, &strindex)) {
+        printf("ELF: string index not found\n");
         goto cleanupfail;
     }
     Elf_Scn *section = NULL;
